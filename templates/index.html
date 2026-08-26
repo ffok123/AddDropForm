@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Course Adjustment Request</title>
+  <style>
+    :root { --canvas: #f6f4ef; --surface: #ffffff; --ink: #101820; --muted: #687078; --line: #c8cdca; --accent: #e51d35; --soft: #f0eee8; }
+    :root[data-theme="dark"] { --canvas: #14191b; --surface: #1d2527; --ink: #f7f3eb; --muted: #b2b8b5; --line: #52605d; --accent: #ff6a76; --soft: #273032; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: var(--canvas); color: var(--ink); font-family: Georgia, "Times New Roman", serif; }
+    .page { width: min(100% - 32px, 920px); margin: 0 auto; padding: 40px 0 56px; }
+    header { display: flex; align-items: start; justify-content: space-between; gap: 24px; padding-bottom: 26px; border-bottom: 1px solid var(--ink); }
+    h1 { margin: 0; font-size: clamp(2rem, 5vw, 3.75rem); line-height: .98; letter-spacing: 0; max-width: 600px; }
+    .number { color: var(--accent); font: 400 clamp(2.2rem, 7vw, 4.9rem)/.8 Arial, sans-serif; }
+    .theme-toggle { flex: 0 0 auto; width: 42px; height: 42px; border: 1px solid var(--ink); color: var(--ink); background: transparent; font-size: 19px; cursor: pointer; }
+    form { padding-top: 34px; }
+    .details, .course-row { display: grid; grid-template-columns: 1fr 1fr; gap: 30px 26px; }
+    .field { min-width: 0; }
+    label, legend { display: block; margin-bottom: 12px; font: 700 .78rem/1.2 Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+    .required { color: var(--accent); }
+    input { width: 100%; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 12px 0 17px; color: var(--ink); background: transparent; font: 1.15rem/1.25 Arial, sans-serif; outline: none; }
+    input:focus { border-color: var(--accent); border-bottom-width: 2px; padding-bottom: 16px; }
+    input::placeholder { color: var(--muted); opacity: 1; }
+    input[type="date"] { color-scheme: light; }
+    :root[data-theme="dark"] input[type="date"] { color-scheme: dark; }
+    .date-note { margin: 10px 0 0; color: var(--muted); font: .93rem/1.4 Arial, sans-serif; }
+    fieldset { margin: 34px 0 0; padding: 24px 0 0; border: 0; border-top: 1px solid var(--line); }
+    .course-row { align-items: end; margin-bottom: 18px; }
+    .course-row .field { margin: 0; }
+    .course-section { align-items: end; }
+    .submit { margin-top: 38px; padding: 15px 22px; border: 0; color: #fff; background: var(--accent); font: 700 .86rem/1 Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+    .flash { margin: 0 0 20px; padding: 14px 16px; border-left: 4px solid var(--accent); background: var(--soft); font: .95rem/1.4 Arial, sans-serif; }
+    .flash.success { border-color: #248a55; }
+    @media (max-width: 620px) { .page { width: min(100% - 28px, 920px); padding-top: 28px; } header { gap: 12px; padding-bottom: 20px; } h1 { font-size: 2.25rem; } .number { font-size: 3.2rem; } .details, .course-row { grid-template-columns: 1fr; gap: 24px; } form { padding-top: 28px; } fieldset { margin-top: 30px; } .course-row { padding-bottom: 20px; border-bottom: 1px solid var(--line); } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div><p class="number"></p><h3>Add Drop Form for GE course</h3></div>
+      <button class="theme-toggle" type="button" aria-label="Toggle color mode" title="Toggle color mode">&#9681;</button>
+    </header>
+    <form method="post">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}<p class="flash {{ category }}">{{ message }}</p>{% endfor %}
+      {% endwith %}
+      <section class="details">
+        <div class="field"><label for="student-id">Student ID (SID) <span class="required">*</span></label><input id="student-id" name="student_id" required placeholder="e.g. 26xxxxxx"></div>
+        <div class="field"><label for="student-name">Student name <span class="required">*</span></label><input id="student-name" name="student_name" required placeholder="First and last name"></div>
+        <div class="field"><label for="department">Department <span class="required">*</span></label><input id="department" name="department" required placeholder="e.g. Computer Science"></div>
+        <div class="field"><label for="requested-date">Requested date <span class="required">*</span></label><input id="requested-date" name="requested_date" required type="date" min="{{ today }}"><p class="date-note">Choose the date of your request.</p></div>
+      </section>
+      <fieldset><legend>Courses to add <span class="required">*</span></legend>
+        <div id="course-list"><div class="course-row"><div class="field">
+            <label>Course title <span class="required">*</span></label><input name="course_title[]" required placeholder="e.g. GFQR1026"></div><div class="course-section"><div class="field"><label>Section</label><input name="course_section[]" placeholder="e.g. Section 12"></div></div></div></div></fieldset>
+      <button class="submit" type="submit">Submit request</button>
+    </form>
+  </main>
+  <script>
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) root.dataset.theme = savedTheme;
+    document.querySelector('.theme-toggle').addEventListener('click', () => { const next = root.dataset.theme === 'dark' ? 'light' : 'dark'; root.dataset.theme = next; localStorage.setItem('theme', next); });
+  </script>
+</body>
+</html>
